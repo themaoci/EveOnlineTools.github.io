@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EVE Online - Planetary Optimizer</title>
+  <link rel="stylesheet" href="styles.css">
+  
+  
+  <style>
+	body, p{color:white;background:black}
+	input{width:120px;height:30px;text-align:center;color:white;background:black;border:1px solid white}
+	input:hover{border:1px solid blue}
+	.selected{border:1px solid red}
+  </style>
+  
+</head>
+
+<body>
+	<div style="margin:0 auto;width:400px;text-align:center;">
+	<h1>Planetary Industry<br>Tier 2 Materials<br>Self Sufficient</h1>
+		<input type="submit" id="btnGas" value="Gas"/><br>
+		<input type="submit" id="btnBarren" value="Barren"/><br>
+		<input type="submit" id="btnTemperate" value="Temperate"/><br>
+		<input type="submit" id="btnLava" value="Lava"/><br>
+		<input type="submit" id="btnStorm" value="Storm"/><br>
+		<input type="submit" id="btnIce" value="Ice"/><br>
+		<input type="submit" id="btnOceanic" value="Oceanic"/><br>
+		<input type="submit" id="btnPlasma" value="Plasma"/><br>
+		<hr>
+		<p id="results"></p>
+	</div>
+</body>
+<script>
+var baseMaterials = [
+	"Microorganisms","Carbon Compounds","Planktic Colonies","Non-CS Crystals",
+	"Ionic Solutions","Autotrophs","Reactive Gas","Noble Gas","Suspended Plasma",
+	"Noble Metals","Complex Organisms","Base Metals","Felsic Magma","Heavy Metals",
+	"Aqueous Liquids"
+];
+var t1endProducts = {
+	"Microorganisms": "Bacteria",
+	"Carbon Compounds": "Biofuels",
+	"Planktic Colonies": "Biomass",
+	"Non-CS Crystals": "Chiral Structures",
+	"Ionic Solutions": "Electrolytes",
+	"Autotrophs": "Industrial Fibers",
+	"Reactive Gas": "Oxidizing Compound",
+	"Noble Gas": "Oxygen",
+	"Suspended Plasma": "Plasmoids",
+	"Noble Metals": "Precious Metals",
+	"Complex Organisms": "Proteins",
+	"Base Metals": "Reactive Metals",
+	"Felsic Magma": "Silicon",
+	"Heavy Metals": "Toxic Metals",
+	"Aqueous Liquids": "Water",
+};
+var t2endProducts = {
+	"Precious Metals|Biofuels":"Biocells",
+	"Toxic Metals|Reactive Metals":"Construction Blocks",
+	"Chiral Structures|Toxic Metals":"Consumer Electronics",
+	"Water|Electrolytes":"Coolant",
+	"Toxic Metals|Precious Metals":"Enriched Uranium",
+	"Proteins|Bacteria":"Fertilizer",
+	"Biomass|Proteins":"Genetically Enhanced Livestock",
+	"Biofuels|Proteins":"Livestock",
+	"Precious Metals|Reactive Metals":"Mechanical Parts",
+	"Silicon|Industrial Fibers":"Microfiber Shielding",
+	"Silicon|Chiral Structures":"Miniature Electronics",
+	"Reactive Metals|Bacteria":"Nanites",
+	"Oxygen|Oxidizing Compound":"Oxides",
+	"Industrial Fibers|Oxidizing Compound":"Polyaramids",
+	"Industrial Fibers|Biofuels":"Polytextiles",
+	"Electrolytes|Plasmoids":"Rocket Fuel",
+	"Silicon|Oxidizing Compound":"Silicate Glass",
+	"Water|Plasmoids":"Superconductors",
+	"Biomass|Oxygen":"Supertensile Plastics",
+	"Oxygen|Electrolytes":"Synthetic Oil",
+	"Water|Bacteria":"Test Cultures",
+	"Chiral Structures|Plasmoids":"Transmitter",
+	"Biomass|Bacteria":"Viral Agent",
+	"Water|Reactive Metals":"Water-Cooled CPU",
+}
+var SelectedValues = ["Aqueous Liquids","Base Metals","Carbon Compounds","Microorganisms","Noble Metals"];
+
+let btnGas = document.getElementById("btnGas");
+let btnBarren = document.getElementById("btnBarren");
+let btnTemperate = document.getElementById("btnTemperate");
+let btnLava = document.getElementById("btnLava");
+let btnStorm = document.getElementById("btnStorm");
+let btnIce = document.getElementById("btnIce");
+let btnOceanic = document.getElementById("btnOceanic");
+let btnPlasma = document.getElementById("btnPlasma");
+
+let results = document.getElementById("results");
+
+let resetClass = (_btn) => {
+	_btn.classList.remove("selected");
+}
+let resetAllBtnClasses = () => {
+	resetClass(btnGas);
+	resetClass(btnBarren);
+	resetClass(btnTemperate);
+	resetClass(btnLava);
+	resetClass(btnStorm);
+	resetClass(btnIce);
+	resetClass(btnOceanic);
+	resetClass(btnPlasma);
+}
+
+btnGas.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnGas.classList.add("selected");
+	SelectedValues = ["Aqueous Liquids","Base Metals","Carbon Compounds","Microorganisms","Noble Metals"];
+	generateResults();
+});
+btnBarren.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnBarren.classList.add("selected");
+	SelectedValues = ["Aqueous Liquids","Base Metals","Ionic Solutions","Noble Gas","Reactive Gas"];
+	generateResults();
+});
+btnTemperate.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnTemperate.classList.add("selected");
+	SelectedValues = ["Aqueous Liquids","Autotrophs","Carbon Compounds","Complex Organisms","Microorganisms"];
+	generateResults();
+});
+btnLava.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnLava.classList.add("selected");
+	SelectedValues = ["Base Metals","Felsic Magma","Heavy Metals","Non-CS Crystals","Suspended Plasma"];
+	generateResults();
+});
+btnStorm.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnStorm.classList.add("selected");
+	SelectedValues = ["Aqueous Liquids","Base Metals","Ionic Solutions","Noble Gas","Suspended Plasma"];
+	generateResults();
+});
+btnIce.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnIce.classList.add("selected");
+	SelectedValues = ["Aqueous Liquids","Heavy Metals","Microorganisms","Noble Gas","Planktic Colonies"];
+	generateResults();
+});
+btnOceanic.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnOceanic.classList.add("selected");
+	SelectedValues = ["Aqueous Liquids","Carbon Compounds","Complex Organisms","Microorganisms","Planktic Colonies"];
+	generateResults();
+});
+btnPlasma.addEventListener('click', function() {
+	resetAllBtnClasses();
+	btnPlasma.classList.add("selected");
+	SelectedValues = ["Base Metals","Heavy Metals","Noble Metals","Non-CS Crystals","Suspended Plasma"];
+	generateResults();
+});
+
+let generateResults = () => {
+	var allOptions = []
+	var SelectedOptions = [
+		t1endProducts[SelectedValues[0]],
+		t1endProducts[SelectedValues[1]],
+		t1endProducts[SelectedValues[2]],
+		t1endProducts[SelectedValues[3]],
+		t1endProducts[SelectedValues[4]]
+	];
+	
+	let addOption = (option) => {
+		if(allOptions.includes(option)) return;
+		allOptions.push(option);
+	} 
+	addOption(SelectedOptions[0] + "|" + SelectedOptions[1]);
+	addOption(SelectedOptions[0] + "|" + SelectedOptions[2]);
+	addOption(SelectedOptions[0] + "|" + SelectedOptions[3]);
+	addOption(SelectedOptions[0] + "|" + SelectedOptions[4]);
+	addOption(SelectedOptions[1] + "|" + SelectedOptions[2]);
+	addOption(SelectedOptions[1] + "|" + SelectedOptions[3]);
+	addOption(SelectedOptions[1] + "|" + SelectedOptions[4]);
+	addOption(SelectedOptions[2] + "|" + SelectedOptions[1]);
+	addOption(SelectedOptions[2] + "|" + SelectedOptions[3]);
+	addOption(SelectedOptions[2] + "|" + SelectedOptions[4]);
+	addOption(SelectedOptions[3] + "|" + SelectedOptions[1]);
+	addOption(SelectedOptions[3] + "|" + SelectedOptions[2]);
+	addOption(SelectedOptions[3] + "|" + SelectedOptions[4]);
+	addOption(SelectedOptions[4] + "|" + SelectedOptions[1]);
+	addOption(SelectedOptions[4] + "|" + SelectedOptions[2]);
+	addOption(SelectedOptions[4] + "|" + SelectedOptions[3]);
+
+	let availableOptions = [];
+	for(let option of allOptions){
+		let t2product = t2endProducts[option];
+		
+		if(t2product != undefined){
+			availableOptions.push(t2product)
+		}
+	}
+	results.innerHTML = "";
+	for(let option of availableOptions){
+		results.innerHTML += option + "<br>";
+	}
+}
+
+  </script>
+</html>
